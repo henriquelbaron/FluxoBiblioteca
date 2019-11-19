@@ -6,7 +6,15 @@ public class Fluxo {
 
 	private Long id;
 	private Date timeStamp;
-	private Integer pessoasDentro;
+	private boolean direcao; // true == entou false == saiu
+
+	public boolean isDirecao() {
+		return direcao;
+	}
+
+	public void setDirecao(boolean direcao) {
+		this.direcao = direcao;
+	}
 
 	public Long getId() {
 		return id;
@@ -22,14 +30,6 @@ public class Fluxo {
 
 	public void setTimeStamp(Date timeStamp) {
 		this.timeStamp = timeStamp;
-	}
-
-	public Integer getPessoasDentro() {
-		return pessoasDentro;
-	}
-
-	public void setPessoasDentro(Integer pessoasDentro) {
-		this.pessoasDentro = pessoasDentro;
 	}
 
 }

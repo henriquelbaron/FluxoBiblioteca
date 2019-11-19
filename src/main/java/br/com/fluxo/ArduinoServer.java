@@ -11,8 +11,8 @@ import br.com.fluxo.domain.Fluxo;
 public class ArduinoServer {
 
 	public static void main(String[] arg) throws Exception {
-		String nomePorta = "/dev/ttyUSB1";
-		int frequenciaSerial = 9600;
+		String nomePorta = "/dev/ttyUSB0";
+		int frequenciaSerial = 115200;
 		SerialPort port = null;
 		InputStream in = null;
 		try {
@@ -21,30 +21,33 @@ public class ArduinoServer {
 			port.openPort();
 			in = port.getInputStream();
 			byte[] buffer = new byte[1024];
-			String message = "";
 			BaseDao fluxoDao = new BaseDao();
 			while (true) {
+				Thread.sleep(10000);
 				int len = in.read(buffer);
 				if (len > 0) {
-					message = new String(buffer);
-					System.out.println(message);
-					Fluxo fluxo = new Fluxo();
-					fluxo.setTimeStamp(new Date(System.currentTimeMillis()));
-					try {
-						Integer numero = Integer.parseInt(message.trim());
-						fluxo.setPessoasDentro(numero);
-					} catch (NumberFormatException e) {
-						System.out.println(e);
-					}
-					if (fluxo.getPessoasDentro() != null) {
-						fluxoDao.inserir(fluxo);
+					String message = new String(buffer);
+					if (!message.isBlank()) {
+						String[] array = message.split("\n");
+						for (int i = 0; i < array.length; i++) {
+							if (!array[i].trim().isEmpty()) {
+								Fluxo fluxo = new Fluxo();
+								fluxo.setTimeStamp(new Date(System.currentTimeMillis()));
+								if (array[i].trim().equals("1")) {
+									fluxo.setDirecao(true);
+								} else if (array[i].trim().equals("-1")) {
+									fluxo.setDirecao(false);
+								}
+								fluxoDao.inserir(fluxo);
+							}
+						}
+						System.out.println(message);
 					}
 				}
 			}
 		} finally {
 			in.close();
 			port.closePort();
-			System.out.println("done");
 		}
 	}
 
